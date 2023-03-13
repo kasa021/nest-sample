@@ -1,13 +1,14 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post , HttpCode, Header} from '@nestjs/common';
 
 @Controller('cats')
 export class CatsController {
   @Post()
-  create(): string {
+  @Header('Cache-Control', 'none')
+  create() {
     return 'This action adds a new cat';
   }
 
-  @Get()
+  @Get('ab*cd')
   findAll(): string {
     return 'This action returns all cats';
   }

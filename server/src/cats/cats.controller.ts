@@ -31,12 +31,11 @@ export class CatsController {
     console.log(params.id);
     return `This action returns a #${params.id} cat`;
   }
-}
 
-@Controller({ host: 'admin.example.com' })
-export class AdminController {
   @Get()
-  index(): string {
-    return 'Admin page';
+  async findAll(): Promise<any[]> {
+    return [];
   }
 }
+
+

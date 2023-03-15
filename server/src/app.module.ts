@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { CatsController } from './cats/cats.controller';
 import { CrudModule } from './crud/crud.module';
 import { CatsService } from './cats/cats.service';
+import { CatsModule } from './cats/cats.module';
 
 @Module({
-  imports: [CrudModule],
+  imports: [CrudModule, CatsModule],
   controllers: [AppController, CatsController],
   providers: [AppService, CatsService],
 })

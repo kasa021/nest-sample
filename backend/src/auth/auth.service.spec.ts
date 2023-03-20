@@ -1,18 +1,38 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { User } from '../users/entities/user.entity';
+import { LoginDto } from './dto/login.dto';
 
-describe('AuthService', () => {
-  let service: AuthService;
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
+  async validateUser(
+    username: string,
+    password: string,
+  ): Promise<Omit<User, 'hashedPassword'> | undefined> {
+    const user = await this.usersService.findUserByName(username);
+    if (!user) {
+      throw new NotAcceptableException('ユーザーが存在しません。');
+    }
+    const passwordValid = await bcrypt.compare(password, user.hashedPassword);
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
-    }).compile();
+    if (passwordValid) {
+      const { hashedPassword, ...result } = user;
+      return result;
+    }
 
-    service = module.get<AuthService>(AuthService);
-  });
+    return undefined;
+  }
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+  async login(loginDto: LoginDto) {
+    const payload = { username: loginDto.username, sub: loginDto.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+}

@@ -1,0 +1,1 @@
+nest g  --no-spec res "文字列"
